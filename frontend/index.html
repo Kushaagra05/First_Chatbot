@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 AI Chatbot</h1>
+            <div class="header-info">
+                <span class="provider-badge" id="provider">OpenAI</span>
+                <button onclick="clearChat()" class="clear-btn">Clear Chat</button>
+            </div>
+        </div>
+
+        <div class="messages-container" id="messages">
+            <div class="welcome-message">
+                <h2>👋 Welcome!</h2>
+                <p>Start a conversation by typing a message below.</p>
+            </div>
+        </div>
+
+        <form class="input-container" onsubmit="sendMessage(event)">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="Type your message..." 
+                autocomplete="off"
+                required
+            >
+            <button type="submit" id="sendBtn">📤</button>
+        </form>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
