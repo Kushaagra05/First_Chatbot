@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001';
+const API_URL = 'https://first-chatbot-backend.onrender.com';
 let conversationHistory = [];
 
 // Check API health on load
