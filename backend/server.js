@@ -76,7 +76,7 @@ async function handleGeminiChat(message, conversationHistory) {
     throw new Error('Gemini API not configured');
   }
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
   // Build conversation context
   let prompt = '';
