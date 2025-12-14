@@ -73,7 +73,7 @@ async function sendMessage(event) {
     } catch (error) {
         console.error('Error:', error);
         removeTypingIndicator(typingId);
-        addMessage('Sorry, I encountered an error. Please make sure the backend server is running on port 3001.', 'assistant', true);
+        addMessage('Sorry, I encountered an error connecting to the server. Please try again.', 'assistant', true);
     } finally {
         sendBtn.disabled = false;
     }
