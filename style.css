@@ -92,6 +92,58 @@ body {
     margin-bottom: 10px;
 }
 
+.mode-hint {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #6c757d;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border-left: 3px solid #667eea;
+}
+
+.mode-hint strong {
+    color: #667eea;
+}
+
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mode-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.mode-toggle input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.research-report {
+    border-left: 4px solid #667eea;
+}
+
+.research-report .message-content {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
+}
+
+.research-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-style: italic;
+    color: #667eea;
+    padding: 10px;
+}
+
 .message {
     display: flex;
     margin-bottom: 20px;

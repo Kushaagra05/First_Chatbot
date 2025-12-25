@@ -22,6 +22,9 @@ async function sendMessage(event) {
     
     if (!message) return;
     
+    // Check if research mode is enabled
+    const researchMode = document.getElementById('researchMode').checked;
+    
     // Clear input
     input.value = '';
     
@@ -40,42 +43,122 @@ async function sendMessage(event) {
     sendBtn.disabled = true;
     
     try {
-        // Send to API
-        const response = await fetch(`${API_URL}/api/chat`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                message: message,
-                conversationHistory: conversationHistory.slice(-10) // Last 10 messages
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to get response from server');
+        if (researchMode) {
+            // Research mode - use multi-agent workflow
+            await handleResearchMode(message, typingId);
+        } else {
+            // Normal chat mode
+            await handleNormalChat(message, typingId);
         }
-        
-        const data = await response.json();
-        
-        // Remove typing indicator
-        removeTypingIndicator(typingId);
-        
-        // Add assistant message
-        addMessage(data.reply, 'assistant');
-        
-        // Update conversation history
-        conversationHistory.push(
-            { role: 'user', content: message },
-            { role: 'assistant', content: data.reply }
-        );
-        
     } catch (error) {
         console.error('Error:', error);
         removeTypingIndicator(typingId);
         addMessage('Sorry, I encountered an error connecting to the server. Please try again.', 'assistant', true);
     } finally {
         sendBtn.disabled = false;
+    }
+}
+
+// Handle normal chat mode
+async function handleNormalChat(message, typingId) {
+    const response = await fetch(`${API_URL}/api/chat`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            message: message,
+            conversationHistory: conversationHistory.slice(-10)
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to get response from server');
+    }
+    
+    const data = await response.json();
+    
+    // Remove typing indicator
+    removeTypingIndicator(typingId);
+    
+    // Add assistant message
+    addMessage(data.reply, 'assistant');
+    
+    // Update conversation history
+    conversationHistory.push(
+        { role: 'user', content: message },
+        { role: 'assistant', content: data.reply }
+    );
+}
+
+// Handle research mode - multi-agent workflow
+async function handleResearchMode(topic, typingId) {
+    // Update typing indicator to show research status
+    updateTypingIndicator(typingId, '🔬 Researching...');
+    
+    const response = await fetch(`${API_URL}/api/research`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic })
+    });
+    
+    if (!response.ok) {
+        throw new Error('Failed to generate research report');
+    }
+    
+    const data = await response.json();
+    
+    // Remove typing indicator
+    removeTypingIndicator(typingId);
+    
+    // Add research report with special formatting
+    addResearchReport(data.report);
+    
+    // Update conversation history
+    conversationHistory.push(
+        { role: 'user', content: topic },
+        { role: 'assistant', content: data.report }
+    );
+}
+
+// Add research report with special formatting
+function addResearchReport(report) {
+    const messagesContainer = document.getElementById('messages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message assistant research-report';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    const roleSpan = document.createElement('div');
+    roleSpan.className = 'message-role';
+    roleSpan.innerHTML = '🔬 Research Report';
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    
+    // Convert line breaks to HTML
+    textDiv.innerHTML = report.replace(/\n/g, '<br>');
+    
+    contentDiv.appendChild(roleSpan);
+    contentDiv.appendChild(textDiv);
+    messageDiv.appendChild(contentDiv);
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Update typing indicator text
+function updateTypingIndicator(id, text) {
+    const element = document.getElementById(id);
+    if (element) {
+        const contentDiv = element.querySelector('.message-content');
+        if (contentDiv) {
+            contentDiv.innerHTML = `<div class="research-status">${text}</div>`;
+        }
     }
 }
 
@@ -144,6 +227,7 @@ function clearChat() {
         <div class="welcome-message">
             <h2>👋 Welcome!</h2>
             <p>Start a conversation by typing a message below.</p>
+            <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent reports</p>
         </div>
     `;
     conversationHistory = [];

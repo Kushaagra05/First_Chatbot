@@ -12,6 +12,10 @@
             <h1>🤖 AI Chatbot</h1>
             <div class="header-info">
                 <span class="provider-badge" id="provider">OpenAI</span>
+                <label class="mode-toggle">
+                    <input type="checkbox" id="researchMode">
+                    <span>🔬 Research Mode</span>
+                </label>
                 <button onclick="clearChat()" class="clear-btn">Clear Chat</button>
             </div>
         </div>
@@ -20,6 +24,7 @@
             <div class="welcome-message">
                 <h2>👋 Welcome!</h2>
                 <p>Start a conversation by typing a message below.</p>
+                <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent reports</p>
             </div>
         </div>
 

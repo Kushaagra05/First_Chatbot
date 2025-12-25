@@ -117,6 +117,131 @@ async function handleOpenAIChat(message, conversationHistory) {
 }
 
 
+// Multi-agent helper function
+async function callAgent(agentType, input) {
+  const provider = process.env.API_PROVIDER;
+  
+  const prompts = {
+    researcher: `You are the Researcher Agent.
+Your job is to gather comprehensive information about:
+
+TOPIC: ${input}
+
+Provide:
+- Definitions and background
+- Key concepts and components
+- Real-world applications
+- Pros & cons
+- Current trends and future outlook
+
+Return the info in clear bullet points.`,
+
+    summarizer: `You are the Summarizer Agent.
+Take the following research and create a concise summary.
+
+Research:
+${input}
+
+Return:
+- Key points (3-5 main ideas)
+- Simplified explanation
+- Most important facts`,
+
+    critic: `You are the Critic Agent.
+Analyze this summary and identify gaps or improvements needed.
+
+Summary:
+${input}
+
+Check for:
+- Missing key information
+- Vague or unclear explanations
+- Areas needing more detail
+- Potential inaccuracies
+
+Return your critique as bullet points.`,
+
+    writer: `You are the Writer Agent.
+Create a well-structured report on:
+
+TOPIC: ${input.topic}
+
+Using this summary:
+${input.summary}
+
+And addressing these critique points:
+${input.critique}
+
+Format the report with:
+- Clear sections with headers
+- Professional tone
+- Easy-to-read structure
+- Bullet points where appropriate`
+  };
+
+  const prompt = prompts[agentType];
+  
+  if (provider === 'gemini') {
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } else if (provider === 'openai') {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: 'user', content: prompt }]
+    });
+    return completion.choices[0].message.content;
+  }
+}
+
+// Research endpoint - multi-agent workflow
+app.post('/api/research', async (req, res) => {
+  try {
+    const { topic } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: 'Topic is required' });
+    }
+
+    console.log(`\n=== Research Request: ${topic} ===`);
+
+    // Step 1: Research
+    console.log('Researching...');
+    const research = await callAgent('researcher', topic);
+
+    // Step 2: Summarize
+    console.log('Summarizing...');
+    const summary = await callAgent('summarizer', research);
+
+    // Step 3: Critique
+    console.log('Critiquing...');
+    const critique = await callAgent('critic', summary);
+
+    // Step 4: Write final report
+    console.log('Writing final report...');
+    const finalReport = await callAgent('writer', { topic, summary, critique });
+
+    res.json({
+      report: finalReport,
+      metadata: {
+        research,
+        summary,
+        critique
+      },
+      provider: process.env.API_PROVIDER,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Research error:', error);
+    res.status(500).json({
+      error: 'Failed to generate research report',
+      details: error.message
+    });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
