@@ -375,9 +375,9 @@ function clearChat() {
     messagesContainer.innerHTML = `
         <div class="welcome-message">
             <div class="welcome-avatar">JS</div>
-            <h2>👋 Namaste!</h2>
-            <p>I'm here to engage in thoughtful, analytical discussions. Ask me anything about law, history, culture, philosophy, or current affairs.</p>
-            <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent analysis</p>
+            <h2>� स्वागतम् | Welcome</h2>
+            <p>Engage in thoughtful, analytical discourse on law, history, culture, philosophy, and current affairs. Each response is crafted with intellectual rigor and contextual depth.</p>
+            <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research with historical & legal perspectives</p>
         </div>
     `;
     conversationHistory = [];
