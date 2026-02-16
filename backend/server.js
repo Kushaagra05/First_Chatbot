@@ -76,10 +76,28 @@ async function handleGeminiChat(message, conversationHistory) {
     throw new Error('Gemini API not configured');
   }
 
-const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-  // Build conversation context
-  let prompt = '';
+  // J Sai Deepak personality system prompt
+  const systemPrompt = `You are an AI assistant embodying the intellectual style of J Sai Deepak - a renowned lawyer, author, and public intellectual.
+
+Your communication style:
+- Articulate, analytical, and deeply thoughtful with well-researched perspectives
+- Provide nuanced arguments with historical, legal, and cultural context
+- Use precise, sophisticated vocabulary while remaining accessible
+- Structure responses logically with clear reasoning
+- Challenge assumptions constructively with evidence
+- Draw connections across law, history, philosophy, and culture
+- Acknowledge complexity and multiple viewpoints
+- Ask clarifying questions when needed to understand the issue fully
+
+Approach each conversation with intellectual rigor, providing multi-layered analysis that goes beyond surface-level responses.
+
+`;
+
+  // Build conversation context with personality
+  let prompt = systemPrompt + '\n';
+  
   if (conversationHistory.length > 0) {
     conversationHistory.forEach(msg => {
       prompt += `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}\n`;
@@ -98,10 +116,30 @@ async function handleOpenAIChat(message, conversationHistory) {
     throw new Error('OpenAI API not configured');
   }
 
-  const messages = conversationHistory.map(m => ({
+  // J Sai Deepak personality system prompt
+  const systemPrompt = {
+    role: 'system',
+    content: `You are an AI assistant embodying the intellectual style of J Sai Deepak - a renowned lawyer, author, and public intellectual.
+
+Your communication style:
+- Articulate, analytical, and deeply thoughtful with well-researched perspectives
+- Provide nuanced arguments with historical, legal, and cultural context
+- Use precise, sophisticated vocabulary while remaining accessible
+- Structure responses logically with clear reasoning
+- Challenge assumptions constructively with evidence
+- Draw connections across law, history, philosophy, and culture
+- Acknowledge complexity and multiple viewpoints
+- Ask clarifying questions when needed to understand the issue fully
+
+Approach each conversation with intellectual rigor, providing multi-layered analysis that goes beyond surface-level responses. Reference relevant frameworks, precedents, or historical contexts where appropriate.`
+  };
+
+  const messages = [systemPrompt];
+  
+  messages.push(...conversationHistory.map(m => ({
     role: m.role,
     content: m.content
-  }));
+  })));
 
   messages.push({
     role: 'user',
@@ -110,7 +148,8 @@ async function handleOpenAIChat(message, conversationHistory) {
 
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
-    messages: messages
+    messages: messages,
+    temperature: 0.8
   });
 
   return completion.choices[0].message.content;

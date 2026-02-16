@@ -3,28 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chatbot</title>
+    <title>AI Chatbot - J Sai Deepak Style</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 AI Chatbot</h1>
+            <div class="header-left">
+                <div class="avatar">JS</div>
+                <div class="header-title">
+                    <h1>AI Chatbot</h1>
+                    <span class="subtitle">J Sai Deepak Style</span>
+                </div>
+            </div>
             <div class="header-info">
                 <span class="provider-badge" id="provider">OpenAI</span>
                 <label class="mode-toggle">
                     <input type="checkbox" id="researchMode">
-                    <span>🔬 Research Mode</span>
+                    <span>🔬 Research</span>
                 </label>
-                <button onclick="clearChat()" class="clear-btn">Clear Chat</button>
+                <button onclick="toggleDarkMode()" class="theme-btn" title="Toggle Dark Mode">🌓</button>
+                <button onclick="clearChat()" class="clear-btn">Clear</button>
             </div>
         </div>
 
         <div class="messages-container" id="messages">
             <div class="welcome-message">
-                <h2>👋 Welcome!</h2>
-                <p>Start a conversation by typing a message below.</p>
-                <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent reports</p>
+                <div class="welcome-avatar">JS</div>
+                <h2>👋 Namaste!</h2>
+                <p>I'm here to engage in thoughtful, analytical discussions. Ask me anything about law, history, culture, philosophy, or current affairs.</p>
+                <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent analysis</p>
             </div>
         </div>
 
@@ -32,14 +45,18 @@
             <input 
                 type="text" 
                 id="messageInput" 
-                placeholder="Type your message..." 
+                placeholder="Type your question..." 
                 autocomplete="off"
                 required
             >
-            <button type="submit" id="sendBtn">📤</button>
+            <button type="submit" id="sendBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
         </form>
     </div>
 
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=5"></script>
 </body>
 </html>

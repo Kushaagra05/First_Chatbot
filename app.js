@@ -1,6 +1,29 @@
 const API_URL = 'https://first-chatbot-backend.onrender.com';
 let conversationHistory = [];
 
+// Configure marked.js for markdown rendering
+marked.setOptions({
+    breaks: true,
+    gfm: true,
+    highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+    }
+});
+
+// Dark mode toggle
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+// Load dark mode preference
+if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+}
+
 // Check API health on load
 async function checkAPIHealth() {
     try {
@@ -162,32 +185,153 @@ function updateTypingIndicator(id, text) {
     }
 }
 
-// Add message to UI
+// Add message to UI with markdown rendering
 function addMessage(text, role, isError = false) {
     const messagesContainer = document.getElementById('messages');
     
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}${isError ? ' error' : ''}`;
     
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar';
+    avatarDiv.textContent = role === 'user' ? 'You' : 'JS';
+    
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
     
-    const roleSpan = document.createElement('div');
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'message-header';
+    
+    const roleSpan = document.createElement('span');
     roleSpan.className = 'message-role';
-    roleSpan.textContent = role === 'user' ? '👤 You' : '🤖 Assistant';
+    roleSpan.textContent = role === 'user' ? 'You' : 'J Sai Deepak Style AI';
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    timeSpan.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    
+    headerDiv.appendChild(roleSpan);
+    headerDiv.appendChild(timeSpan);
     
     const textDiv = document.createElement('div');
     textDiv.className = 'message-text';
-    textDiv.textContent = text;
     
-    contentDiv.appendChild(roleSpan);
+    if (role === 'assistant' && !isError) {
+        // Render markdown for assistant messages
+        textDiv.innerHTML = marked.parse(text);
+        // Highlight code blocks
+        textDiv.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    } else {
+        textDiv.textContent = text;
+    }
+    
+    contentDiv.appendChild(headerDiv);
     contentDiv.appendChild(textDiv);
+    
+    // Add copy button for assistant messages
+    if (role === 'assistant' && !isError) {
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>`;
+        copyBtn.title = 'Copy message';
+        copyBtn.onclick = () => copyMessage(text, copyBtn);
+        contentDiv.appendChild(copyBtn);
+    }
+    
+    messageDiv.appendChild(avatarDiv);
     messageDiv.appendChild(contentDiv);
     
     messagesContainer.appendChild(messageDiv);
     
     // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Add research report with special formatting
+function addResearchReport(report) {
+    const messagesContainer = document.getElementById('messages');
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message assistant research-report';
+    
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar research';
+    avatarDiv.textContent = '🔬';
+    
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'message-header';
+    
+    const roleSpan = document.createElement('span');
+    roleSpan.className = 'message-role';
+    roleSpan.innerHTML = '🔬 Multi-Agent Research Report';
+    
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'message-time';
+    timeSpan.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    
+    headerDiv.appendChild(roleSpan);
+    headerDiv.appendChild(timeSpan);
+    
+    const textDiv = document.createElement('div');
+    textDiv.className = 'message-text';
+    
+    // Render markdown
+    textDiv.innerHTML = marked.parse(report);
+    textDiv.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+    
+    contentDiv.appendChild(headerDiv);
+    contentDiv.appendChild(textDiv);
+    
+    // Add copy button
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>`;
+    copyBtn.title = 'Copy report';
+    copyBtn.onclick = () => copyMessage(report, copyBtn);
+    contentDiv.appendChild(copyBtn);
+    
+    messageDiv.appendChild(avatarDiv);
+    messageDiv.appendChild(contentDiv);
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// Copy message to clipboard
+function copyMessage(text, button) {
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHTML = button.innerHTML;
+        button.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>`;
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+        }, 2000);
+    });
+}
+
+// Update typing indicator text
+function updateTypingIndicator(id, text) {
+    const element = document.getElementById(id);
+    if (element) {
+        const contentDiv = element.querySelector('.message-content');
+        if (contentDiv) {
+            contentDiv.innerHTML = `<div class="research-status">${text}</div>`;
+        }
+    }
 }
 
 // Add typing indicator
@@ -198,14 +342,19 @@ function addTypingIndicator() {
     typingDiv.className = 'message assistant';
     typingDiv.id = 'typing-indicator';
     
+    const avatarDiv = document.createElement('div');
+    avatarDiv.className = 'message-avatar';
+    avatarDiv.textContent = 'JS';
+    
     const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
+    contentDiv.className = 'message-content typing-content';
     
     const indicator = document.createElement('div');
     indicator.className = 'typing-indicator';
     indicator.innerHTML = '<span></span><span></span><span></span>';
     
     contentDiv.appendChild(indicator);
+    typingDiv.appendChild(avatarDiv);
     typingDiv.appendChild(contentDiv);
     messagesContainer.appendChild(typingDiv);
     
@@ -225,9 +374,10 @@ function clearChat() {
     const messagesContainer = document.getElementById('messages');
     messagesContainer.innerHTML = `
         <div class="welcome-message">
-            <h2>👋 Welcome!</h2>
-            <p>Start a conversation by typing a message below.</p>
-            <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent reports</p>
+            <div class="welcome-avatar">JS</div>
+            <h2>👋 Namaste!</h2>
+            <p>I'm here to engage in thoughtful, analytical discussions. Ask me anything about law, history, culture, philosophy, or current affairs.</p>
+            <p class="mode-hint">💡 Enable <strong>Research Mode</strong> for comprehensive multi-agent analysis</p>
         </div>
     `;
     conversationHistory = [];
