@@ -1,0 +1,24 @@
+# Memory Compression and Retrieval System Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core ML/NLP Libraries
+sentence-transformers==2.3.1
+chromadb==0.4.22
+spacy==3.7.2
+
+# API Framework
+flask==3.0.0
+flask-cors==4.0.0
+
+# OpenAI Integration
+openai==1.10.0
+
+# Utilities
+python-dotenv==1.0.0
+numpy==1.26.3
+
+# Production Server
+gunicorn==21.2.0
+
+# Download spaCy English model after installation:
+# python -m spacy download en_core_web_sm
