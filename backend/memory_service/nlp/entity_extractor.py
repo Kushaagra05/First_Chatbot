@@ -1,41 +1,34 @@
 """
 Entity Extraction Module
-Extracts named entities and key topics from conversation text using spaCy.
+Extracts named entities and key topics from conversation text using OpenAI.
+Python 3.14 compatible version (no spaCy dependency).
 """
 
-import spacy
-from typing import List, Dict, Set
+import re
+import os
+from typing import List, Dict
 from collections import Counter
+from openai import OpenAI
 
 class EntityExtractor:
     """
     Extracts entities, topics, and key concepts from conversation text
-    to enrich memory metadata.
+    to enrich memory metadata using OpenAI API.
     """
     
-    def __init__(self, model_name: str = "en_core_web_sm"):
+    def __init__(self, api_key: str = None):
         """
-        Initialize spaCy NLP model for entity extraction.
+        Initialize entity extractor with OpenAI API.
         
         Args:
-            model_name: spaCy model to use
-            
-        Note:
-            If model not found, download with:
-            python -m spacy download en_core_web_sm
+            api_key: OpenAI API key (optional, will use env var if not provided)
         """
-        try:
-            self.nlp = spacy.load(model_name)
-            print(f"Loaded spaCy model: {model_name}")
-        except OSError:
-            print(f"Model '{model_name}' not found. Downloading...")
-            import subprocess
-            subprocess.run(["python", "-m", "spacy", "download", model_name])
-            self.nlp = spacy.load(model_name)
+        self.client = OpenAI(api_key=api_key or os.getenv('OPENAI_API_KEY'))
+        print("Entity extractor initialized with OpenAI API")
     
     def extract_entities(self, text: str) -> Dict[str, List[str]]:
         """
-        Extract named entities from text.
+        Extract named entities from text using OpenAI.
         
         Args:
             text: Input text to process
@@ -49,29 +42,29 @@ class EntityExtractor:
             >>> print(entities)
             {'ORG': ['MIT'], 'EVENT': ['GATE']}
         """
-        doc = self.nlp(text)
-        
-        entities_by_type = {}
-        for ent in doc.ents:
-            if ent.label_ not in entities_by_type:
-                entities_by_type[ent.label_] = []
-            entities_by_type[ent.label_].append(ent.text)
-        
-        # Remove duplicates while preserving order
-        for entity_type in entities_by_type:
-            seen = set()
-            unique_entities = []
-            for ent in entities_by_type[entity_type]:
-                if ent not in seen:
-                    seen.add(ent)
-                    unique_entities.append(ent)
-            entities_by_type[entity_type] = unique_entities
-        
-        return entities_by_type
-    
-    def extract_key_topics(self, text: str, top_n: int = 5) -> List[str]:
-        """
-        Extract key topics/concepts using noun chunks and named entities.
+        try:
+            prompt = f"""Extract named entities from this text and categorize them.
+
+Text: {text}
+
+Return ONLY a JSON object with entity types as keys and lists of entities as values.
+Use these categories: PERSON, ORG, GPE (locations), DATE, EVENT, TOPIC
+
+Example format: {{"ORG": ["MIT", "Google"], "EVENT": ["GATE"], "TOPIC": ["Machine Learning"]}}
+
+JSON:"""
+
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=500
+            )
+            
+            result = response.choices[0].message.content.strip()
+            # Parse JSON response
+            import json
+            entities_by_type = json.loads(OpenAI.
         
         Args:
             text: Input text to process
@@ -85,14 +78,32 @@ class EntityExtractor:
             >>> print(topics)
             ['operating systems', 'help']
         """
-        doc = self.nlp(text.lower())
-        
-        # Collect noun chunks (phrases)
-        topics = []
-        for chunk in doc.noun_chunks:
-            # Filter out very common words
-            if chunk.root.pos_ in ['NOUN', 'PROPN'] and not chunk.root.is_stop:
-                topics.append(chunk.text)
+        try:
+            prompt = f"""Extract the main topics and key concepts from this text.
+
+Text: {text}
+
+Return ONLY a JSON array of the top {top_n} topics/concepts.
+Example: ["operating systems", "database management", "algorithms"]
+
+JSON array:"""
+
+            response = self.client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=200
+            )
+            
+            result = response.choices[0].message.content.strip()
+            import json
+            topics = json.loads(result)
+            return topics[:top_n]
+            
+        except Exception as e:
+            print(f"Topic extraction error: {e}")
+            # Fallback: simple word frequency
+            return self._simple_topic_extraction(text, top_n)pend(chunk.text)
         
         # Also add named entities as topics
         for ent in doc.ents:
@@ -138,13 +149,32 @@ class EntityExtractor:
         important_concepts = self._identify_concepts(full_text)
         
         metadata = {
-            'entities': entities,
-            'topics': topics,
-            'concepts': important_concepts,
-            'message_count': len(conversation)
+         simple_entity_extraction(self, text: str) -> Dict[str, List[str]]:
+        """
+        Fallback: Simple pattern-based entity extraction.
+        """
+        entities = {
+            'TOPIC': [],
+            'ORG': []
         }
         
-        return metadata
+        # Extract capitalized words as potential entities
+        words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', text)
+        entities['ORG'] = list(set(words))
+        
+        return entities
+    
+    def _simple_topic_extraction(self, text: str, top_n: int) -> List[str]:
+        """
+        Fallback: Simple word frequency based topic extraction.
+        """
+        # Remove common words and extract nouns
+        words = re.findall(r'\b[a-z]{4,}\b', text.lower())
+        stopwords = {'this', 'that', 'with', 'from', 'have', 'been', 'were', 'their'}
+        words = [w for w in words if w not in stopwords]
+        
+        word_counts = Counter(words)
+        return [word for word, _ in word_counts.most_common(top_n)]
     
     def _identify_concepts(self, text: str) -> List[str]:
         """
@@ -156,9 +186,16 @@ class EntityExtractor:
         Returns:
             List of identified concepts
         """
-        doc = self.nlp(text.lower())
-        
+        # Extract multi-word technical terms and capitalized words
         concepts = []
+        
+        # Find capitalized multi-word terms
+        capitalized = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', text)
+        concepts.extend(capitalized)
+        
+        # Find technical abbreviations (2-5 uppercase letters)
+        abbreviations = re.findall(r'\b[A-Z]{2,5}\b', text)
+        concepts.extend(abbreviations)
         
         # Look for capitalized terms and noun phrases
         for token in doc:
@@ -192,14 +229,14 @@ class EntityExtractor:
 
 # Example usage
 if __name__ == "__main__":
-    # Initialize extractor
+    # Initialize extractor (requires OPENAI_API_KEY in environment)
     extractor = EntityExtractor()
     
     # Test text
     test_text = """
     I'm preparing for the GATE Computer Science exam at IIT Delhi. 
     I'm particularly weak in Operating Systems and Database Management Systems.
-    I've been reading about Indian constitutional law and J Sai Deepak's books on legal philosophy.
+    I've been reading about Indian constitutional law.
     """
     
     print("=== ENTITY EXTRACTION ===")

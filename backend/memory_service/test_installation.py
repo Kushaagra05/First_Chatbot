@@ -24,7 +24,6 @@ print("\n[2/7] Testing core dependencies...")
 try:
     import sentence_transformers
     import chromadb
-    import spacy
     import flask
     import openai
     from dotenv import load_dotenv
@@ -44,16 +43,14 @@ else:
     print("⚠️  OpenAI API key not found or invalid")
     print("Create .env file with: OPENAI_API_KEY=your_key_here")
 
-# Test 4: spaCy model
-print("\n[4/7] Testing spaCy model...")
-try:
-    nlp = spacy.load("en_core_web_sm")
-    doc = nlp("This is a test sentence.")
-    print("✅ spaCy model loaded successfully")
-except OSError:
-    print("❌ spaCy model not found")
-    print("Run: python -m spacy download en_core_web_sm")
-    sys.exit(1)
+# Test 4: OpenAI API key
+print("\n[4/7] Testing OpenAI API key...")
+api_key = os.getenv('OPENAI_API_KEY')
+if api_key and api_key.startswith('sk-'):
+    print(f"✅ OpenAI API key loaded (sk-...{api_key[-4:]})")
+else:
+    print("⚠️  OpenAI API key not found or invalid")
+    print("Create .env file with: OPENAI_API_KEY=your_key_here")
 
 # Test 5: SentenceTransformer
 print("\n[5/7] Testing embedding model...")
@@ -98,6 +95,7 @@ print("=" * 60)
 print("\nYour memory system is ready to use!")
 print("\nNext steps:")
 print("1. Create .env file with your OPENAI_API_KEY")
+print("\nNext steps:")
 print("2. Run: python api.py")
 print("3. Test API: curl http://localhost:5001/health")
 print("\n" + "=" * 60)
