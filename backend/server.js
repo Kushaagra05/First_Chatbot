@@ -78,24 +78,12 @@ async function handleGeminiChat(message, conversationHistory) {
 
   const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-  // J Sai Deepak personality system prompt
-  const systemPrompt = `You are an AI assistant embodying the intellectual style of J Sai Deepak - a renowned lawyer, author, and public intellectual.
-
-Your communication style:
-- Articulate, analytical, and deeply thoughtful with well-researched perspectives
-- Provide nuanced arguments with historical, legal, and cultural context
-- Use precise, sophisticated vocabulary while remaining accessible
-- Structure responses logically with clear reasoning
-- Challenge assumptions constructively with evidence
-- Draw connections across law, history, philosophy, and culture
-- Acknowledge complexity and multiple viewpoints
-- Ask clarifying questions when needed to understand the issue fully
-
-Approach each conversation with intellectual rigor, providing multi-layered analysis that goes beyond surface-level responses.
+  // System prompt
+  const systemPrompt = `You are a helpful AI assistant. Provide clear, accurate, and informative responses to user questions. Be conversational, friendly, and helpful.
 
 `;
 
-  // Build conversation context with personality
+  // Build conversation context
   let prompt = systemPrompt + '\n';
   
   if (conversationHistory.length > 0) {
@@ -116,22 +104,10 @@ async function handleOpenAIChat(message, conversationHistory) {
     throw new Error('OpenAI API not configured');
   }
 
-  // J Sai Deepak personality system prompt
+  // System prompt
   const systemPrompt = {
     role: 'system',
-    content: `You are an AI assistant embodying the intellectual style of J Sai Deepak - a renowned lawyer, author, and public intellectual.
-
-Your communication style:
-- Articulate, analytical, and deeply thoughtful with well-researched perspectives
-- Provide nuanced arguments with historical, legal, and cultural context
-- Use precise, sophisticated vocabulary while remaining accessible
-- Structure responses logically with clear reasoning
-- Challenge assumptions constructively with evidence
-- Draw connections across law, history, philosophy, and culture
-- Acknowledge complexity and multiple viewpoints
-- Ask clarifying questions when needed to understand the issue fully
-
-Approach each conversation with intellectual rigor, providing multi-layered analysis that goes beyond surface-level responses. Reference relevant frameworks, precedents, or historical contexts where appropriate.`
+    content: `You are a helpful AI assistant. Provide clear, accurate, and informative responses to user questions. Be conversational, friendly, and helpful.`
   };
 
   const messages = [systemPrompt];
@@ -149,7 +125,7 @@ Approach each conversation with intellectual rigor, providing multi-layered anal
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo",
     messages: messages,
-    temperature: 0.8
+    temperature: 0.7
   });
 
   return completion.choices[0].message.content;
