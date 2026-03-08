@@ -1,0 +1,20 @@
+services:
+  # Python Memory Service
+  - type: web
+    name: first-chatbot-memory-service
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: backend/memory_service
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT --timeout 120 api:app
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MEMORY_THRESHOLD
+        value: 20
+      - key: TOP_K_MEMORIES
+        value: 3
+      - key: FLASK_DEBUG
+        value: False
+    healthCheckPath: /health
