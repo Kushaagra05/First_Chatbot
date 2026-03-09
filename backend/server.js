@@ -3,6 +3,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import OpenAI from 'openai';
+import {
+  checkMemoryServiceHealth,
+  getMemoryStats,
+  processChatWithMemory
+} from './memoryIntegration.js';
 
 dotenv.config();
 
@@ -35,10 +40,36 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Chat endpoint
+// Memory service health check endpoint
+app.get('/api/memory/health', async (req, res) => {
+  try {
+    const health = await checkMemoryServiceHealth();
+    res.json(health);
+  } catch (error) {
+    res.status(503).json({
+      status: 'unavailable',
+      error: error.message
+    });
+  }
+});
+
+// Memory statistics endpoint
+app.get('/api/memory/stats', async (req, res) => {
+  try {
+    const stats = await getMemoryStats();
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to fetch memory stats',
+      details: error.message
+    });
+  }
+});
+
+// Chat endpoint with memory integration
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, conversationHistory = [] } = req.body;
+    const { message, conversationHistory = [], sessionId = 'default' } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
@@ -47,10 +78,18 @@ app.post('/api/chat', async (req, res) => {
     const provider = process.env.API_PROVIDER;
     let reply;
 
-    if (provider === 'gemini') {
+    // Use memory integration for OpenAI chat
+    if (provider === 'openai') {
+      reply = await processChatWithMemory(
+        sessionId,
+        message,
+        async (enhancedMessage) => {
+          return await handleOpenAIChat(enhancedMessage, conversationHistory);
+        }
+      );
+    } else if (provider === 'gemini') {
+      // Gemini can use memory too, but keep simple for now
       reply = await handleGeminiChat(message, conversationHistory);
-    } else if (provider === 'openai') {
-      reply = await handleOpenAIChat(message, conversationHistory);
     } else {
       return res.status(500).json({ error: 'No API provider configured' });
     }
@@ -58,6 +97,7 @@ app.post('/api/chat', async (req, res) => {
     res.json({
       reply,
       provider,
+      sessionId,
       timestamp: new Date().toISOString()
     });
 

@@ -3,7 +3,7 @@
  * Connects Node.js backend with Python memory service
  */
 
-const axios = require('axios');
+import axios from 'axios';
 
 // Configuration
 const MEMORY_SERVICE_URL = process.env.MEMORY_SERVICE_URL || 'http://localhost:5001';
@@ -242,7 +242,7 @@ function clearSession(sessionId) {
   conversationSessions.delete(sessionId);
 }
 
-module.exports = {
+export {
   checkMemoryServiceHealth,
   addMessage,
   shouldCompressConversation,
