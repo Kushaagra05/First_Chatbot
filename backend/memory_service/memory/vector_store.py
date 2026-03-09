@@ -61,7 +61,9 @@ class VectorMemoryStore:
             model="text-embedding-3-small",
             input=text
         )
-        return response.data[0].embeddingy: str, metadata: Optional[Dict] = None) -> str:
+        return response.data[0].embedding
+    
+    def store_memory(self, summary: str, metadata: Optional[Dict] = None) -> str:
         """
         Store a compressed memory summary with its embedding.
         
