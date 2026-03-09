@@ -7,7 +7,7 @@ services:
     plan: free
     rootDir: backend/memory_service
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn -w 2 -b 0.0.0.0:$PORT --timeout 120 api:app
+    startCommand: gunicorn -w 1 -b 0.0.0.0:$PORT --timeout 120 --preload api:app
     envVars:
       - key: OPENAI_API_KEY
         sync: false
@@ -17,4 +17,3 @@ services:
         value: 3
       - key: FLASK_DEBUG
         value: False
-    healthCheckPath: /health

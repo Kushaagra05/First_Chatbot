@@ -19,16 +19,22 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Node.js backend
 
-# Initialize memory components
-compressor = MemoryCompressor(api_key=os.getenv('OPENAI_API_KEY'))
-vector_store = VectorMemoryStore(persist_directory=os.getenv('CHROMA_DB_PATH', './chroma_db'))
-retriever = MemoryRetriever(vector_store)
-entity_extractor = EntityExtractor()
-prompt_builder = PromptBuilder()
-
 # Configuration
 MEMORY_THRESHOLD = int(os.getenv('MEMORY_THRESHOLD', 20))
 TOP_K_MEMORIES = int(os.getenv('TOP_K_MEMORIES', 3))
+
+# Lazy initialization - models loaded on first use
+_components = {}
+
+def get_components():
+    """Lazy load memory components on first use."""
+    if not _components:
+        _components['compressor'] = MemoryCompressor(api_key=os.getenv('OPENAI_API_KEY'))
+        _components['vector_store'] = VectorMemoryStore(persist_directory=os.getenv('CHROMA_DB_PATH', './chroma_db'))
+        _components['retriever'] = MemoryRetriever(_components['vector_store'])
+        _components['entity_extractor'] = EntityExtractor()
+        _components['prompt_builder'] = PromptBuilder()
+    return _components
 
 
 @app.route('/health', methods=['GET'])
@@ -72,15 +78,18 @@ def compress_conversation():
                 'error': 'No conversation provided'
             }), 400
         
+        # Get components (lazy load)
+        components = get_components()
+        
         # Compress conversation
         print(f"Compressing {len(conversation)} messages...")
-        summary = compressor.compress_conversation(conversation)
+        summary = components['compressor'].compress_conversation(conversation)
         
         # Extract metadata
-        metadata = entity_extractor.extract_metadata_from_conversation(conversation)
+        metadata = components['entity_extractor'].extract_metadata_from_conversation(conversation)
         
         # Store in vector database
-        memory_id = vector_store.store_memory(
+        memory_id = components['vector_store'].store_memory(
             summary=summary,
             metadata=metadata
         )
@@ -137,9 +146,12 @@ def retrieve_memories():
                 'error': 'No query provided'
             }), 400
         
+        # Get components (lazy load)
+        components = get_components()
+        
         # Retrieve relevant memories
         print(f"Retrieving memories for: {query[:50]}...")
-        memories = retriever.retrieve_with_metadata(query, top_k=top_k)
+        memories = components['retriever'].retrieve_with_metadata(query, top_k=top_k)
         
         return jsonify({
             'success': True,
@@ -188,13 +200,16 @@ def build_enhanced_prompt():
                 'error': 'No query provided'
             }), 400
         
+        # Get components (lazy load)
+        components = get_components()
+        
         # Retrieve memories if requested
         memories = []
         if should_retrieve:
-            memories = retriever.retrieve_relevant_memories(query, top_k=TOP_K_MEMORIES)
+            memories = components['retriever'].retrieve_relevant_memories(query, top_k=TOP_K_MEMORIES)
         
         # Build enhanced prompt
-        enhanced_prompt = prompt_builder.build_prompt(
+        enhanced_prompt = components['prompt_builder'].build_prompt(
             current_query=query,
             retrieved_memories=memories,
             recent_history=recent_history
@@ -228,7 +243,8 @@ def get_statistics():
         }
     """
     try:
-        stats = retriever.get_memory_statistics()
+        components = get_components()
+        stats = components['retriever'].get_memory_statistics()
         stats['memory_threshold'] = MEMORY_THRESHOLD
         stats['top_k_memories'] = TOP_K_MEMORIES
         
@@ -257,7 +273,8 @@ def clear_all_memories():
         }
     """
     try:
-        vector_store.clear_all_memories()
+        components = get_components()
+        components['vector_store'].clear_all_memories()
         
         return jsonify({
             'success': True,
