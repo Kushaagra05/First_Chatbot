@@ -1,8 +1,5 @@
-# Memory Compression and Retrieval System Dependencies
+# Memory System Dependencies - Minimal Version
 # Install with: pip install -r requirements.txt
-
-# Core Database
-chromadb>=0.4.22
 
 # API Framework
 flask==3.0.0
@@ -13,7 +10,6 @@ openai>=1.30.0
 
 # Utilities
 python-dotenv==1.0.0
-numpy>=2.3.2
 
 # Production Server
 gunicorn==21.2.0

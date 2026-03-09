@@ -13,7 +13,7 @@ from openai import OpenAI
 class VectorMemoryStore:
     """
     Manages storage and retrieval of conversation memories in a vector database.
-    Uses ChromaDB for persistent storage and SentenceTransformers for embeddings.
+    Uses ChromaDB for persistent storage and OpenAI for embeddings.
     """
     
     def __init__(self, persist_dir: str = "./chroma_db", collection_name: str = "conversation_memories"):
