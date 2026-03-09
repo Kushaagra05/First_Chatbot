@@ -1,8 +1,7 @@
 # Memory Compression and Retrieval System Dependencies
 # Install with: pip install -r requirements.txt
 
-# Core ML/NLP Libraries
-sentence-transformers>=2.3.1
+# Core Database
 chromadb>=0.4.22
 
 # API Framework

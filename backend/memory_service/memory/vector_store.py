@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import List, Dict, Optional
 import chromadb
 from chromadb.config import Settings
-from sentence_transformers import SentenceTransformer
+from openai import OpenAI
 
 class VectorMemoryStore:
     """
@@ -18,7 +18,7 @@ class VectorMemoryStore:
     
     def __init__(self, persist_dir: str = "./chroma_db", collection_name: str = "conversation_memories"):
         """
-        Initialize the vector store with ChromaDB and embedding model.
+        Initialize the vector store with ChromaDB and OpenAI embeddings.
         
         Args:
             persist_dir: Directory to persist ChromaDB data
@@ -26,6 +26,9 @@ class VectorMemoryStore:
         """
         self.persist_dir = persist_dir
         self.collection_name = collection_name
+        
+        # Initialize OpenAI client for embeddings
+        self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         
         # Initialize ChromaDB client with persistence
         self.client = chromadb.PersistentClient(
@@ -41,15 +44,12 @@ class VectorMemoryStore:
             name=collection_name,
             metadata={"description": "Compressed conversation memories"}
         )
-        
-        # Initialize embedding model (lightweight and efficient)
-        print("Loading embedding model...")
-        self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-        print("Embedding model loaded successfully")
     
     def generate_embedding(self, text: str) -> List[float]:
         """
         Generate embedding vector for input text.
+        
+        Args: using OpenAI.
         
         Args:
             text: Input text to embed
@@ -57,10 +57,11 @@ class VectorMemoryStore:
         Returns:
             List of floats representing the embedding vector
         """
-        embedding = self.embedding_model.encode(text, convert_to_numpy=True)
-        return embedding.tolist()
-    
-    def store_memory(self, summary: str, metadata: Optional[Dict] = None) -> str:
+        response = self.openai_client.embeddings.create(
+            model="text-embedding-3-small",
+            input=text
+        )
+        return response.data[0].embeddingy: str, metadata: Optional[Dict] = None) -> str:
         """
         Store a compressed memory summary with its embedding.
         
