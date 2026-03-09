@@ -2,7 +2,7 @@ services:
   # Python Memory Service
   - type: web
     name: first-chatbot-memory-service
-    runtime: python3.11
+    runtime: python
     region: singapore
     plan: free
     rootDir: backend/memory_service
