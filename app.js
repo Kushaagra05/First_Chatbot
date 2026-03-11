@@ -194,7 +194,7 @@ function addMessage(text, role, isError = false) {
     
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'message-avatar';
-    avatarDiv.textContent = role === 'user' ? 'You' : 'JS';
+    avatarDiv.textContent = role === 'user' ? 'You' : 'SY';
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -204,7 +204,7 @@ function addMessage(text, role, isError = false) {
     
     const roleSpan = document.createElement('span');
     roleSpan.className = 'message-role';
-    roleSpan.textContent = role === 'user' ? 'You' : 'AI Assistant';
+    roleSpan.textContent = role === 'user' ? 'You' : 'Synapse';
     
     const timeSpan = document.createElement('span');
     timeSpan.className = 'message-time';
@@ -374,9 +374,9 @@ function clearChat() {
     const messagesContainer = document.getElementById('messages');
     messagesContainer.innerHTML = `
         <div class="welcome-message">
-            <div class="welcome-avatar">AI</div>
-            <h2>👋 Welcome!</h2>
-            <p>I'm your AI assistant. Ask me anything and I'll help you with clear, informative responses.</p>
+            <div class="welcome-avatar">SY</div>
+            <h2>👋 Welcome to Synapse!</h2>
+            <p>I'm Synapse, your intelligent AI assistant with advanced memory. Ask me anything and I'll help you with clear, informative responses.</p>
             <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research</p>
         </div>
     `;
