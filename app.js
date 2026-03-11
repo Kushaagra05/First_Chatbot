@@ -401,7 +401,7 @@ function clearChat() {
                     <path d="M56 48 L40 44" stroke="currentColor" stroke-width="2.5" opacity="0.4"/>
                 </svg>
             </div>
-            <h2>👋 Welcome to Synapse!</h2>
+            <h2>Welcome to Synapse!</h2>
             <p>I'm Synapse, your intelligent AI assistant with advanced memory. Ask me anything and I'll help you with clear, informative responses.</p>
             <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research</p>
         </div>
