@@ -165,8 +165,8 @@ body::before {
 }
 
 .avatar svg {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     color: white;
 }
 
@@ -324,8 +324,8 @@ body::before {
 }
 
 .welcome-avatar svg {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     color: white;
 }
 
@@ -402,8 +402,8 @@ body::before {
 }
 
 .message-avatar svg {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     color: white;
 }
 
