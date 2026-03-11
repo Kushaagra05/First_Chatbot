@@ -164,6 +164,12 @@ body::before {
     transition: all 0.3s ease;
 }
 
+.avatar svg {
+    width: 30px;
+    height: 30px;
+    color: white;
+}
+
 .avatar:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
@@ -317,6 +323,12 @@ body::before {
     animation: float 3s ease-in-out infinite;
 }
 
+.welcome-avatar svg {
+    width: 56px;
+    height: 56px;
+    color: white;
+}
+
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
@@ -387,6 +399,12 @@ body::before {
     font-size: 13px;
     box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
+}
+
+.message-avatar svg {
+    width: 26px;
+    height: 26px;
+    color: white;
 }
 
 .message:hover .message-avatar {
@@ -741,6 +759,11 @@ body::before {
         font-size: 12px;
     }
 
+    .message-avatar svg {
+        width: 22px;
+        height: 22px;
+    }
+
     .message-content {
         font-size: 14px;
     }
@@ -763,11 +786,21 @@ body::before {
         height: 40px;
         font-size: 16px;
     }
+
+    .avatar svg {
+        width: 24px;
+        height: 24px;
+    }
     
     .welcome-avatar {
         width: 72px;
         height: 72px;
         font-size: 32px;
+    }
+
+    .welcome-avatar svg {
+        width: 48px;
+        height: 48px;
     }
 
     .welcome-message h2 {

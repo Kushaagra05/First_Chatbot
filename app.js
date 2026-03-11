@@ -194,7 +194,22 @@ function addMessage(text, role, isError = false) {
     
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'message-avatar';
-    avatarDiv.textContent = role === 'user' ? 'You' : 'SY';
+    if (role === 'user') {
+        avatarDiv.textContent = 'You';
+    } else {
+        avatarDiv.innerHTML = `
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="20" r="4" fill="currentColor"/>
+                <circle cx="28" cy="20" r="4" fill="currentColor"/>
+                <circle cx="20" cy="20" r="2.5" fill="currentColor" opacity="0.8"/>
+                <line x1="16" y1="20" x2="24" y2="20" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+                <path d="M12 16 L20 18" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                <path d="M12 24 L20 22" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                <path d="M28 16 L20 18" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+                <path d="M28 24 L20 22" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            </svg>
+        `;
+    }
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
@@ -374,7 +389,18 @@ function clearChat() {
     const messagesContainer = document.getElementById('messages');
     messagesContainer.innerHTML = `
         <div class="welcome-message">
-            <div class="welcome-avatar">SY</div>
+            <div class="welcome-avatar">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="40" r="8" fill="currentColor"/>
+                    <circle cx="56" cy="40" r="8" fill="currentColor"/>
+                    <circle cx="40" cy="40" r="5" fill="currentColor" opacity="0.8"/>
+                    <line x1="32" y1="40" x2="48" y2="40" stroke="currentColor" stroke-width="3" opacity="0.6"/>
+                    <path d="M24 32 L40 36" stroke="currentColor" stroke-width="2.5" opacity="0.4"/>
+                    <path d="M24 48 L40 44" stroke="currentColor" stroke-width="2.5" opacity="0.4"/>
+                    <path d="M56 32 L40 36" stroke="currentColor" stroke-width="2.5" opacity="0.4"/>
+                    <path d="M56 48 L40 44" stroke="currentColor" stroke-width="2.5" opacity="0.4"/>
+                </svg>
+            </div>
             <h2>👋 Welcome to Synapse!</h2>
             <p>I'm Synapse, your intelligent AI assistant with advanced memory. Ask me anything and I'll help you with clear, informative responses.</p>
             <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research</p>
