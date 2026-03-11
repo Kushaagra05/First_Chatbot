@@ -31,7 +31,7 @@
     --bg-gradient-end: #1e1b4b;
     --surface-color: #1e293b;
     --text-primary: #f1f5f9;
-    --text-secondary: #cbd5e1;
+    --text-secondary: #94a3b8;
     --border-color: #334155;
     --hover-bg: #334155;
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -659,6 +659,11 @@ body::before {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+.input-container input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+}
+
 .input-container input:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
@@ -793,4 +798,35 @@ body::before {
 .dark-mode .message.error .message-content {
     background: #7f1d1d;
     border-color: #dc2626;
+}
+
+/* ===== Dark Mode Overrides ===== */
+.dark-mode .message.user .message-content {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: 2px solid #3b82f6;
+}
+
+.dark-mode .message-content {
+    background: #1e293b;
+}
+
+.dark-mode .input-container input::placeholder {
+    color: #64748b;
+    opacity: 1;
+}
+
+.dark-mode .message-text code {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.dark-mode .message-text pre {
+    background: #0f172a;
+    border-color: #1e293b;
+}
+
+.dark-mode .research-report .message-content {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(219, 39, 119, 0.1) 100%);
+    border-color: #ec4899;
 }
