@@ -374,10 +374,10 @@ function clearChat() {
     const messagesContainer = document.getElementById('messages');
     messagesContainer.innerHTML = `
         <div class="welcome-message">
-            <div class="welcome-avatar">JS</div>
-            <h2>� स्वागतम् | Welcome</h2>
-            <p>Engage in thoughtful, analytical discourse on law, history, culture, philosophy, and current affairs. Each response is crafted with intellectual rigor and contextual depth.</p>
-            <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research with historical & legal perspectives</p>
+            <div class="welcome-avatar">AI</div>
+            <h2>👋 Welcome!</h2>
+            <p>I'm your AI assistant. Ask me anything and I'll help you with clear, informative responses.</p>
+            <p class="mode-hint">💡 <strong>Deep Analysis Mode</strong> enables comprehensive multi-agent research</p>
         </div>
     `;
     conversationHistory = [];
