@@ -204,7 +204,7 @@ function addMessage(text, role, isError = false) {
     
     const roleSpan = document.createElement('span');
     roleSpan.className = 'message-role';
-    roleSpan.textContent = role === 'user' ? 'You' : 'J Sai Deepak Style AI';
+    roleSpan.textContent = role === 'user' ? 'You' : 'AI Assistant';
     
     const timeSpan = document.createElement('span');
     timeSpan.className = 'message-time';
